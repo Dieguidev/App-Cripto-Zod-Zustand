@@ -1,7 +1,8 @@
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, FormEvent, useState } from "react";
 import { currencies } from "../data";
 import { useCryptoStore } from "../store";
 import { Pair } from "../types";
+import { ErrorMessage } from "./ErrorMessage";
 
 export const CriptoSearchForm = () => {
   const { cryptoCurrencies } = useCryptoStore();
@@ -11,6 +12,8 @@ export const CriptoSearchForm = () => {
     criptoCurrency: "",
   });
 
+  const [error, setError] = useState('')
+
   const hadleChange = (e: ChangeEvent<HTMLSelectElement>) => {
     setPair({
       ...pair,
@@ -18,11 +21,28 @@ export const CriptoSearchForm = () => {
     });
   };
 
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if(Object.values(pair).includes('')){
+      setError('Todos los campos son obligatorios')
+      return
+    }
+    setError('')
+
+
+  };
+
   return (
-    <form className="form">
+    <form className="form" onSubmit={handleSubmit}>
+      {error && <ErrorMessage>{error}</ErrorMessage>}
       <div className="field">
         <label htmlFor="currency">Moneda:</label>
-        <select name="currency" id="criptoCurrency" onChange={hadleChange}>
+        <select
+          name="currency"
+          id="criptoCurrency"
+          onChange={hadleChange}
+          value={pair.currency}
+        >
           <option value="">--Seleccione --</option>
           {currencies.map((currency) => (
             <option value={currency.code} key={currency.code}>
@@ -38,6 +58,7 @@ export const CriptoSearchForm = () => {
           name="criptoCurrency"
           id="criptoCurrency"
           onChange={hadleChange}
+          value={pair.criptoCurrency}
         >
           <option value="">--Seleccione --</option>
           {cryptoCurrencies.map((crypto) => (
